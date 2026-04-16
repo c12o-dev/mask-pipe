@@ -1,0 +1,71 @@
+name: Pattern proposal
+description: Propose a new built-in secret pattern.
+title: "[pattern] "
+labels: ["type:pattern", "status:triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for proposing a new pattern. Every pattern must meet mask-pipe's **precision-over-recall** bar (see [docs/specs/002-pattern-library.md](../../docs/specs/002-pattern-library.md)).
+
+        **Minimum requirements:** 5+ real-world match examples and 5+ no-match examples. Patterns that can't clearly distinguish their target from normal text will be rejected or moved behind an opt-in flag.
+
+  - type: input
+    id: name
+    attributes:
+      label: Pattern name (ID)
+      description: kebab-case, stable identifier (e.g., `azure_storage_key`)
+      placeholder: "vendor_secret_name"
+    validations:
+      required: true
+
+  - type: input
+    id: regex
+    attributes:
+      label: Regex (Go RE2 syntax)
+      description: The pattern to match. Prefer anchors and explicit prefixes where possible.
+      placeholder: '^AKIA[0-9A-Z]{16}$'
+    validations:
+      required: true
+
+  - type: textarea
+    id: matches
+    attributes:
+      label: Should match (5+ examples)
+      description: Realistic — synthetic values are fine, but they should resemble what real secrets look like.
+      placeholder: |
+        AKIAIOSFODNN7EXAMPLE
+        AKIA1234567890ABCDEF
+        ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: no_matches
+    attributes:
+      label: Should NOT match (5+ examples)
+      description: Common false-positive candidates. This is the single most important field.
+      placeholder: |
+        AKIA (too short)
+        akia1234567890abcdef (lowercase)
+        "AKIA..." (in example code)
+        ...
+    validations:
+      required: true
+
+  - type: input
+    id: source
+    attributes:
+      label: Source
+      description: Link to vendor documentation, RFC, or other authoritative reference defining the format.
+      placeholder: "https://docs.aws.amazon.com/..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: rationale
+    attributes:
+      label: Why this belongs in the default set
+      description: Why should this be built-in rather than a custom pattern in user config? Volume of users affected, severity of leaks, etc.
+    validations:
+      required: true

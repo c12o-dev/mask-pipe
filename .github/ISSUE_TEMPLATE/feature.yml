@@ -1,0 +1,52 @@
+name: Feature request
+description: Propose new functionality that does not change existing spec'd behavior.
+title: "[feature] "
+labels: ["type:feature", "status:triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the suggestion. Use this template for **new** functionality that does not change existing behavior.
+
+        If your request **modifies** existing spec'd behavior, use the [Spec change](./spec_change.yml) template instead.
+        If your request is a **new built-in pattern**, use the [Pattern proposal](./pattern.yml) template.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What user pain does this solve? Be specific — "it would be nice" isn't enough.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: What should mask-pipe do? Sketch the CLI / config / behavior.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: What else did you think about? Why is this approach better?
+
+  - type: dropdown
+    id: spec_impact
+    attributes:
+      label: Spec impact
+      description: Does this require changes to existing spec files?
+      options:
+        - No — new feature, new spec section only
+        - Yes — modifies existing spec (please also open a spec_change issue)
+        - Unsure — needs discussion
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional context
+      description: Related issues, prior art, external references.
