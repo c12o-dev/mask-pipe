@@ -1,0 +1,30 @@
+# Binaries
+mask-pipe
+mask-pipe.exe
+bin/
+dist/
+
+# Go
+*.test
+*.out
+coverage.*
+vendor/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local config
+.env
+.env.local
+*.local.toml
+.claude/settings.json
+
+# Logs
+*.log

@@ -1,0 +1,68 @@
+name: Bug report
+description: Something is not working as specified.
+title: "[bug] "
+labels: ["type:bug", "status:triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a bug. Please fill out the fields below so we can reproduce and fix it.
+
+        **Before submitting:** verify the behavior against the relevant spec in [docs/specs/](../../docs/specs/). If the spec is ambiguous, use the "Spec change" template instead.
+
+  - type: input
+    id: version
+    attributes:
+      label: mask-pipe version
+      description: Output of `mask-pipe --version`
+      placeholder: "0.1.0 (build abc1234)"
+    validations:
+      required: true
+
+  - type: input
+    id: os
+    attributes:
+      label: OS and terminal
+      description: e.g. "macOS 14.4 / iTerm2 3.5" or "Ubuntu 22.04 / GNOME Terminal"
+    validations:
+      required: true
+
+  - type: textarea
+    id: input
+    attributes:
+      label: Minimal reproduction input
+      description: Paste the exact stdin / command that triggers the bug. **Do not include real secrets** — use synthetic values.
+      render: shell
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected output
+      description: What should mask-pipe produce? Reference the relevant spec section if helpful.
+      render: shell
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual output
+      description: What does mask-pipe actually produce?
+      render: shell
+    validations:
+      required: true
+
+  - type: textarea
+    id: config
+    attributes:
+      label: Config file (if custom)
+      description: Paste the contents of your `~/.mask-pipe.toml` if you have one. Leave empty if using defaults.
+      render: toml
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional context
+      description: Screenshots, logs, related issues — anything else relevant.

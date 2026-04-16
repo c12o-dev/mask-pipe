@@ -1,0 +1,70 @@
+name: Spec change
+description: Propose a change to existing spec'd behavior.
+title: "[spec] "
+labels: ["type:spec", "status:triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Spec changes are the main governance mechanism for this project. Changes to behavior MUST flow through a spec PR before the implementation changes.
+
+        See [CONTRIBUTING.md § Proposing a spec change](../../CONTRIBUTING.md#proposing-a-spec-change).
+
+  - type: dropdown
+    id: spec_file
+    attributes:
+      label: Which spec does this affect?
+      options:
+        - "000-vision.md"
+        - "001-cli-interface.md"
+        - "002-pattern-library.md"
+        - "003-config-format.md"
+        - "004-shell-integration.md"
+        - Multiple (specify below)
+        - New spec needed
+    validations:
+      required: true
+
+  - type: textarea
+    id: current
+    attributes:
+      label: Current behavior
+      description: Quote the relevant line(s) from the current spec verbatim.
+      render: markdown
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed
+    attributes:
+      label: Proposed behavior
+      description: What should the spec say instead? Paste the replacement text.
+      render: markdown
+    validations:
+      required: true
+
+  - type: textarea
+    id: rationale
+    attributes:
+      label: Rationale
+      description: Why is the current behavior wrong or insufficient? What new information prompted this?
+    validations:
+      required: true
+
+  - type: dropdown
+    id: breaking
+    attributes:
+      label: Is this a breaking change?
+      description: Will users need to update their config, scripts, or workflows after this change ships?
+      options:
+        - "No"
+        - "Yes — minor (e.g., new required field with sensible default)"
+        - "Yes — major (e.g., changed flag semantics, removed feature)"
+    validations:
+      required: true
+
+  - type: textarea
+    id: migration
+    attributes:
+      label: Migration notes
+      description: If breaking, how should existing users adapt?
