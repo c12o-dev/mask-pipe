@@ -72,6 +72,38 @@ resource "aws_iam_access_key" "deploy" {
 # Note: the AKIA prefix indicates an AWS access key ID.
 # See https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_identifiers.html
 export AWS_ACCESS_KEY_ID=   # placeholder, set by CI
+
+# GitHub Actions CI
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  GH_PAT: ${{ secrets.DEPLOY_PAT }}
+run: |
+  gh auth status
+  curl -H "Authorization: token $GITHUB_TOKEN" https://api.github.com/user
+
+# Stripe integration docs
+# Keys look like sk_live_... or pk_test_... (see https://docs.stripe.com/keys)
+# In test mode, use the dashboard to rotate keys.
+STRIPE_PUBLISHABLE_KEY=   # set in .env
+
+# Database configuration
+DATABASE_URL=postgres://localhost:5432/myapp   # no credentials in dev
+REDIS_URL=redis://localhost:6379
+
+# JWT documentation
+# A JWT has three parts: header.payload.signature
+# The header starts with eyJ (base64 for {"...)
+# Example structure: {"alg":"HS256","typ":"JWT"}
+
+# Disk operations (should not trigger stripe pattern)
+disk_test_partition_cleanup completed in 42s
+task_live_migration_batch_12345 started
+
+# Various URLs without credentials
+https://example.com:8080/api/v1/@latest
+git@github.com:org/repo.git
+mailto:admin@example.com
+ftp://mirror.example.com/pub/release.tar.gz
 `
 
 func TestBuiltinsZeroMatchesOnCorpus(t *testing.T) {

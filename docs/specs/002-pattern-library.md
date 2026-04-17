@@ -21,11 +21,11 @@ Patterns that cannot meet this bar belong behind an opt-in flag or in a separate
 |---|---|---|---|
 | `aws_access_key` | AWS Access Key ID | `AKIA[0-9A-Z]{16}` | 20-char prefix is unique to AWS; virtually no false positives |
 | `aws_secret_key` | AWS Secret Access Key | `(?i)aws_secret_access_key\s*[=:]\s*([A-Za-z0-9/+=]{40})` | Context-dependent match (key=value form) to avoid false positives on arbitrary 40-char strings |
-| `github_token` | GitHub Token | `gh[pousr]_[A-Za-z0-9_]{36,}` | GitHub's documented token prefix format |
-| `github_pat` | GitHub Fine-grained PAT | `github_pat_[A-Za-z0-9_]{80,}` | Longer prefix for fine-grained PATs |
-| `stripe_key` | Stripe API Key | `[sp]k_(?:live|test)_[A-Za-z0-9]{24,}` | Stripe's documented prefix scheme |
+| `github_token` | GitHub Token | `\bgh[pousr]_[A-Za-z0-9]{36,}` | GitHub's documented token prefix format; `\b` prevents mid-word FP; body is base62 (no `_`) |
+| `github_pat` | GitHub Fine-grained PAT | `\bgithub_pat_[A-Za-z0-9_]{80,}` | Longer prefix for fine-grained PATs; `\b` prevents mid-word FP |
+| `stripe_key` | Stripe API Key | `\b[sp]k_(?:live\|test)_[A-Za-z0-9]{24,}` | Stripe's documented prefix scheme; `\b` prevents `disk_test_...` FP class |
 | `jwt` | JSON Web Token | `eyJ[A-Za-z0-9_-]+\.eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+` | Three dot-separated base64 segments starting with JWT header |
-| `db_url_password` | DB URL password | `://[^:/\s]+:([^@\s]+)@` | Captures the password portion only; masks within the URL |
+| `db_url_password` | DB URL password | `://[^:/\s]+:([^@/\s]+)@` | Captures the password portion only; `/` excluded from capture to avoid `host:port/path@` FP |
 | `pem_private_key` | PEM private key block | `-----BEGIN [A-Z ]*PRIVATE KEY-----[\s\S]*?-----END [A-Z ]*PRIVATE KEY-----` | Multi-line; explicit markers mean no false positives |
 
 ### Pattern metadata (required fields)
