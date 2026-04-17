@@ -10,6 +10,7 @@ ADRs are append-only. Don't edit accepted ADRs; if a decision changes, write a n
 |---|---|---|
 | [0001](0001-language-go.md) | Implementation language: Go | accepted |
 | [0002](0002-explicit-pipe-default.md) | Explicit pipe as default integration pattern | accepted |
+| [0003](0003-project-layout.md) | Project layout: `cmd/` + top-level `patterns/` + `internal/` | accepted |
 
 ## When to write an ADR
 
