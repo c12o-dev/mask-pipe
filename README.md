@@ -14,22 +14,23 @@ STRIPE_SK=sk_live_****************************7dc
 
 TruffleHog guards your code. secretlint guards your commits. **mask-pipe guards your screen.**
 
-> **Status:** pre-release. Specifications are being drafted. See [docs/specs/](docs/specs/) for the current design, and [CONTRIBUTING.md](CONTRIBUTING.md) for how to propose changes.
+> **Status:** v0.1.0 released. 8 built-in patterns, TOML config, dry-run mode. See [releases](https://github.com/c12o-dev/mask-pipe/releases).
 
 ---
 
 ## Install
 
 ```bash
-# Homebrew (coming soon)
-brew install mask-pipe/tap/mask-pipe
-
 # Go
-go install github.com/c12o-dev/mask-pipe@latest
+go install github.com/c12o-dev/mask-pipe/cmd/mask-pipe@latest
+
+# Binary (macOS Apple Silicon)
+curl -sL https://github.com/c12o-dev/mask-pipe/releases/latest/download/mask-pipe_darwin_arm64.tar.gz \
+  | tar xz && sudo mv mask-pipe /usr/local/bin/
 
 # Binary (Linux amd64)
-curl -sSL https://github.com/c12o-dev/mask-pipe/releases/latest/download/mask-pipe_linux_amd64.tar.gz \
-  | tar xz -C /usr/local/bin mask-pipe
+curl -sL https://github.com/c12o-dev/mask-pipe/releases/latest/download/mask-pipe_linux_amd64.tar.gz \
+  | tar xz && sudo mv mask-pipe /usr/local/bin/
 ```
 
 Single binary with zero dependencies. Supports macOS, Linux, and Windows.
@@ -48,11 +49,20 @@ docker logs -f my-app 2>&1 | mask-pipe
 # Review .env files without exposing secrets
 cat .env | mask-pipe
 
-# Inspect Kubernetes pod logs
-kubectl logs pod-name | mask-pipe
-
 # Preview what would be masked (nothing is replaced)
 terraform plan | mask-pipe --dry-run
+
+# Fully mask all secrets (hide tail characters too)
+kubectl logs pod-name | mask-pipe --show-tail 0
+
+# Use a custom mask character
+env | mask-pipe --mask-char '#'
+
+# Diagnose your setup
+mask-pipe doctor
+
+# See which patterns are active
+mask-pipe list-patterns
 ```
 
 ---
@@ -61,16 +71,16 @@ terraform plan | mask-pipe --dry-run
 
 mask-pipe ships with 8 high-precision patterns enabled by default:
 
-| Pattern | Matches | Example |
+| Pattern | What it catches | Masked as |
 |---|---|---|
-| AWS Access Key | `AKIA[0-9A-Z]{16}` | `AKIAIOSFODNN7EXAMPLE` |
-| AWS Secret Key | 40-char key after `AWS_SECRET_ACCESS_KEY=` | `wJalrXUtnFEMI/K7MDENG...` |
-| GitHub Token | `ghp_`, `gho_`, `ghs_`, `github_pat_` | `ghp_ABCDEFGHIJKLMNOPQRSTUVWXYZab...` |
-| Stripe Key | `sk_live_`, `sk_test_`, `pk_live_`, `pk_test_` | `sk_live_4eC39Hq...7dc` |
-| JWT | Three dot-separated base64 segments | `eyJhbGciOi...` |
-| Database URL | Password in `://user:pass@host` | `postgres://admin:s3cret@...` |
-| Password field | `password=`, `passwd=`, `secret=` values | `DB_PASSWORD=hunter2` |
-| Private Key | PEM-encoded private key blocks | `-----BEGIN RSA PRIVATE KEY-----` |
+| `aws_access_key` | `AKIA[0-9A-Z]{16}` | `AKIA************MPLE` |
+| `aws_secret_key` | 40-char key after `aws_secret_access_key=` | `wJal****EKEY` |
+| `github_token` | `ghp_`, `gho_`, `ghu_`, `ghs_`, `ghr_` tokens | `ghp_****1234` |
+| `github_pat` | `github_pat_` fine-grained PATs | `gith****BBcc` |
+| `stripe_key` | `sk_live_`, `sk_test_`, `pk_live_`, `pk_test_` | `sk_l****p7dc` |
+| `jwt` | Three dot-separated base64url segments | `eyJh****sR8U` |
+| `db_url_password` | Password in `://user:pass@host` URLs | `://user:****@host` |
+| `pem_private_key` | PEM private key blocks (multi-line) | `[REDACTED PRIVATE KEY]` |
 
 All patterns are tuned for precision over recall — mask-pipe will not shred your normal output.
 
@@ -84,18 +94,19 @@ Create `~/.mask-pipe.toml` to add custom patterns or tune behavior:
 
 ```toml
 [builtin]
-aws_access_key = true
-github_token   = true
-jwt            = false
+jwt = false   # disable JWT detection
 
 [[custom]]
 name    = "internal-api-key"
 pattern = 'mycompany-key-[a-zA-Z0-9]{32}'
 
+[[allowlist]]
+name    = "aws-doc-example"
+pattern = 'AKIAIOSFODNN7EXAMPLE'
+
 [display]
 mask_char = "*"
 show_tail = 4
-color     = true
 ```
 
 Full schema: [docs/specs/003-config-format.md](docs/specs/003-config-format.md).
