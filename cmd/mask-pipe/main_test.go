@@ -115,3 +115,35 @@ func TestUnknownSubcommand(t *testing.T) {
 		t.Errorf("exit code = %d, want 2", code)
 	}
 }
+
+func TestDryRunNoColor(t *testing.T) {
+	input := "key AKIAIOSFODNN7EXAMPLE here\n"
+	var stdout, stderr bytes.Buffer
+	code := run([]string{"--dry-run", "--no-color"}, strings.NewReader(input), &stdout, &stderr)
+	if code != 0 {
+		t.Errorf("exit code = %d, want 0; stderr=%q", code, stderr.String())
+	}
+	out := stdout.String()
+	if !strings.Contains(out, "[MATCH:aws_access_key]") {
+		t.Errorf("dry-run output missing MATCH tag: %q", out)
+	}
+	if !strings.Contains(out, "AKIAIOSFODNN7EXAMPLE") {
+		t.Errorf("dry-run should preserve original value: %q", out)
+	}
+}
+
+func TestDryRunWithColor(t *testing.T) {
+	input := "AKIAIOSFODNN7EXAMPLE\n"
+	var stdout, stderr bytes.Buffer
+	code := run([]string{"--dry-run"}, strings.NewReader(input), &stdout, &stderr)
+	if code != 0 {
+		t.Errorf("exit code = %d, want 0", code)
+	}
+	out := stdout.String()
+	if !strings.Contains(out, "\033[31m") {
+		t.Errorf("dry-run with color should contain ANSI red: %q", out)
+	}
+	if !strings.Contains(out, "AKIAIOSFODNN7EXAMPLE") {
+		t.Errorf("dry-run should preserve original value: %q", out)
+	}
+}

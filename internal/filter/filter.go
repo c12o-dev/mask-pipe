@@ -21,7 +21,9 @@ type Filter struct {
 	ShowTail  int
 	MaskChar  string
 	Allowlist []*regexp.Regexp
-	Stderr    io.Writer // optional; multi-line safety-limit warnings go here
+	DryRun   bool
+	Color    bool   // emit ANSI color in dry-run mode
+	Stderr    io.Writer
 }
 
 func New(pats []*patterns.Pattern, showTail int) *Filter {
@@ -163,8 +165,23 @@ func (f *Filter) isAllowlisted(value string) bool {
 }
 
 func (f *Filter) mask(p *patterns.Pattern, value string) string {
+	if f.DryRun {
+		return f.dryRunHighlight(p, value)
+	}
 	if p.Replacement != "" {
 		return p.Replacement
 	}
 	return patterns.DefaultMask(value, f.ShowTail, f.MaskChar)
+}
+
+const (
+	ansiRed   = "\033[31m"
+	ansiReset = "\033[0m"
+)
+
+func (f *Filter) dryRunHighlight(p *patterns.Pattern, value string) string {
+	if f.Color {
+		return ansiRed + value + ansiReset
+	}
+	return "[MATCH:" + p.ID + "]" + value + "[/MATCH]"
 }

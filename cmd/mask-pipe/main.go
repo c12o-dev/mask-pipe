@@ -29,6 +29,8 @@ Flags:
       --config <path>   path to config file (default: auto-detect)
       --mask-char <c>   override masking character
       --show-tail <N>   show last N chars of masked values (0 = full mask)
+      --dry-run         highlight matches without masking
+      --no-color        disable ANSI color (also: NO_COLOR env var)
 
 Subcommands:
   list-patterns   print all active built-in and custom patterns
@@ -53,6 +55,8 @@ func run(args []string, stdin io.Reader, stdout, stderr io.Writer) int {
 		configPath  string
 		maskChar    string
 		showTail    int
+		dryRun      bool
+		noColor     bool
 	)
 	fs.BoolVar(&showHelp, "help", false, "")
 	fs.BoolVar(&showHelp, "h", false, "")
@@ -61,6 +65,8 @@ func run(args []string, stdin io.Reader, stdout, stderr io.Writer) int {
 	fs.StringVar(&configPath, "config", "", "")
 	fs.StringVar(&maskChar, "mask-char", "", "")
 	fs.IntVar(&showTail, "show-tail", -1, "")
+	fs.BoolVar(&dryRun, "dry-run", false, "")
+	fs.BoolVar(&noColor, "no-color", false, "")
 
 	if err := fs.Parse(args); err != nil {
 		fmt.Fprintf(stderr, "mask-pipe: %v\n", err)
@@ -107,6 +113,11 @@ func run(args []string, stdin io.Reader, stdout, stderr io.Writer) int {
 		cfg.Display.ShowTail = showTail
 	}
 
+	// NO_COLOR env var overrides color setting
+	if os.Getenv("NO_COLOR") != "" {
+		noColor = true
+	}
+
 	pats := buildPatterns(cfg)
 
 	f := &filter.Filter{
@@ -114,6 +125,8 @@ func run(args []string, stdin io.Reader, stdout, stderr io.Writer) int {
 		ShowTail:  cfg.Display.ShowTail,
 		MaskChar:  cfg.MaskCharStr(),
 		Allowlist: cfg.AllowlistRegexps(),
+		DryRun:   dryRun,
+		Color:    !noColor && cfg.Display.Color,
 		Stderr:    stderr,
 	}
 
