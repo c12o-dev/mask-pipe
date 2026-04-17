@@ -125,8 +125,8 @@ func run(args []string, stdin io.Reader, stdout, stderr io.Writer) int {
 		ShowTail:  cfg.Display.ShowTail,
 		MaskChar:  cfg.MaskCharStr(),
 		Allowlist: cfg.AllowlistRegexps(),
-		DryRun:   dryRun,
-		Color:    !noColor && cfg.Display.Color,
+		DryRun:    dryRun,
+		Color:     !noColor && cfg.Display.Color,
 		Stderr:    stderr,
 	}
 
