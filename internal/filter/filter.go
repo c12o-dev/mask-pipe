@@ -21,8 +21,8 @@ type Filter struct {
 	ShowTail  int
 	MaskChar  string
 	Allowlist []*regexp.Regexp
-	DryRun   bool
-	Color    bool   // emit ANSI color in dry-run mode
+	DryRun    bool
+	Color     bool // emit ANSI color in dry-run mode
 	Stderr    io.Writer
 }
 
