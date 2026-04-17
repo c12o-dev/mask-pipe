@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"regexp"
 	"strings"
 
 	"github.com/c12o-dev/mask-pipe/patterns"
@@ -16,9 +17,11 @@ const (
 
 // Filter reads lines from a reader, masks secret patterns, and writes to a writer.
 type Filter struct {
-	Patterns []*patterns.Pattern
-	ShowTail int
-	Stderr   io.Writer // optional; multi-line safety-limit warnings go here
+	Patterns  []*patterns.Pattern
+	ShowTail  int
+	MaskChar  string
+	Allowlist []*regexp.Regexp
+	Stderr    io.Writer // optional; multi-line safety-limit warnings go here
 }
 
 func New(pats []*patterns.Pattern, showTail int) *Filter {
@@ -138,17 +141,30 @@ func (f *Filter) applyPattern(line string, p *patterns.Pattern) string {
 		if start < 0 {
 			continue
 		}
+		matched := line[start:end]
+		if f.isAllowlisted(matched) {
+			continue
+		}
 		b.WriteString(line[prev:start])
-		b.WriteString(f.mask(p, line[start:end]))
+		b.WriteString(f.mask(p, matched))
 		prev = end
 	}
 	b.WriteString(line[prev:])
 	return b.String()
 }
 
+func (f *Filter) isAllowlisted(value string) bool {
+	for _, re := range f.Allowlist {
+		if re.MatchString(value) {
+			return true
+		}
+	}
+	return false
+}
+
 func (f *Filter) mask(p *patterns.Pattern, value string) string {
 	if p.Replacement != "" {
 		return p.Replacement
 	}
-	return patterns.DefaultMask(value, f.ShowTail)
+	return patterns.DefaultMask(value, f.ShowTail, f.MaskChar)
 }
