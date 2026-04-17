@@ -2,6 +2,7 @@ package filter
 
 import (
 	"bytes"
+	"io"
 	"regexp"
 	"strings"
 	"testing"
@@ -102,5 +103,45 @@ func TestLiteralReplacement(t *testing.T) {
 	want := "value=****"
 	if got != want {
 		t.Errorf("MaskLine = %q, want %q", got, want)
+	}
+}
+
+func TestMultilinePEMBlock(t *testing.T) {
+	f := testFilter()
+	input := "before\n-----BEGIN RSA PRIVATE KEY-----\nMIIBogIBAAJBALRi\nbase64data==\n-----END RSA PRIVATE KEY-----\nafter\n"
+	want := "before\n[REDACTED PRIVATE KEY]\nafter\n"
+	var out bytes.Buffer
+	if err := f.Run(strings.NewReader(input), &out); err != nil {
+		t.Fatalf("Run: %v", err)
+	}
+	if out.String() != want {
+		t.Errorf("Run output = %q, want %q", out.String(), want)
+	}
+}
+
+func TestMultilinePEMWithSurroundingSecrets(t *testing.T) {
+	f := testFilter()
+	input := "key=AKIAIOSFODNN7EXAMPLE\n-----BEGIN PRIVATE KEY-----\ndata\n-----END PRIVATE KEY-----\nclean\n"
+	want := "key=AKIA************MPLE\n[REDACTED PRIVATE KEY]\nclean\n"
+	var out bytes.Buffer
+	if err := f.Run(strings.NewReader(input), &out); err != nil {
+		t.Fatalf("Run: %v", err)
+	}
+	if out.String() != want {
+		t.Errorf("Run output = %q, want %q", out.String(), want)
+	}
+}
+
+func TestMultilineBeginWithoutEnd(t *testing.T) {
+	f := testFilter()
+	f.Stderr = io.Discard
+	// Begin marker without end — should flush unmodified at EOF
+	input := "-----BEGIN RSA PRIVATE KEY-----\norphaned data\n"
+	var out bytes.Buffer
+	if err := f.Run(strings.NewReader(input), &out); err != nil {
+		t.Fatalf("Run: %v", err)
+	}
+	if out.String() != input {
+		t.Errorf("Run output = %q, want %q (unmodified)", out.String(), input)
 	}
 }

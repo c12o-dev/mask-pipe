@@ -9,6 +9,10 @@ import (
 //
 // Replacement: empty string applies DefaultMask (show head + stars + tail);
 // non-empty string is used as a literal replacement (e.g. "****").
+//
+// Multiline patterns use begin/end marker buffering (ADR 0004). The filter
+// engine accumulates lines between BeginMarker and EndMarker, then applies
+// Regex to the joined block.
 type Pattern struct {
 	ID          string
 	Name        string
@@ -18,6 +22,9 @@ type Pattern struct {
 	Examples    []string
 	NonExamples []string
 	Source      string
+	Multiline   bool
+	BeginMarker *regexp.Regexp
+	EndMarker   *regexp.Regexp
 }
 
 const DefaultShowTail = 4
