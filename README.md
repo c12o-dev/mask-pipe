@@ -2,15 +2,9 @@
 
 **Real-time secret masking for your terminal. Pipe it, mask it, done.**
 
-```
-$ env | mask-pipe
-
-AWS_ACCESS_KEY_ID=AKIA****MPLE
-AWS_SECRET_ACCESS_KEY=********************************
-DATABASE_URL=postgres://admin:********@db.example.com:5432/mydb
-GITHUB_TOKEN=ghp_****************************ef01
-STRIPE_SK=sk_live_****************************7dc
-```
+<p align="center">
+  <img src="docs/assets/demo.gif" alt="mask-pipe demo" width="700">
+</p>
 
 TruffleHog guards your code. secretlint guards your commits. **mask-pipe guards your screen.**
 
