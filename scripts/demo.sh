@@ -17,7 +17,9 @@ type_cmd() {
 }
 
 clear
-sleep 1
+echo "  mask-pipe — filter secrets from terminal output"
+echo ""
+sleep 1.5
 
 # 1. AWS key — "検出して隠す"
 type_cmd "echo 'AWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE' | mask-pipe"
