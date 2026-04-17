@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io"
@@ -91,8 +92,7 @@ func run(args []string, stdin io.Reader, stdout, stderr io.Writer) int {
 		case "doctor":
 			return cmdDoctor(configPath, stdout, stderr)
 		case "version":
-			fmt.Fprintf(stdout, "mask-pipe %s (%s)\n", version, commit)
-			return 0
+			return cmdVersion(fs.Args()[1:], stdout)
 		default:
 			fmt.Fprintf(stderr, "mask-pipe: unknown subcommand %q\n", fs.Arg(0))
 			fmt.Fprint(stderr, usage)
@@ -219,6 +219,25 @@ func cmdDoctor(configPath string, stdout, stderr io.Writer) int {
 	}
 	fmt.Fprintln(stdout, "\nDoctor found problems.")
 	return 1
+}
+
+func cmdVersion(args []string, stdout io.Writer) int {
+	jsonFlag := false
+	for _, a := range args {
+		if a == "--json" {
+			jsonFlag = true
+		}
+	}
+	if jsonFlag {
+		v := struct {
+			Version string `json:"version"`
+			Commit  string `json:"commit"`
+		}{version, commit}
+		json.NewEncoder(stdout).Encode(v)
+	} else {
+		fmt.Fprintf(stdout, "mask-pipe %s (%s)\n", version, commit)
+	}
+	return 0
 }
 
 func buildPatterns(cfg *config.Config) []*patterns.Pattern {
