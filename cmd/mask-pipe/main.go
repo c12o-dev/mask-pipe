@@ -1,11 +1,13 @@
 package main
 
 import (
-	"errors"
 	"flag"
 	"fmt"
 	"io"
 	"os"
+
+	"github.com/c12o-dev/mask-pipe/internal/filter"
+	"github.com/c12o-dev/mask-pipe/patterns"
 )
 
 var (
@@ -58,7 +60,8 @@ func run(args []string, stdin io.Reader, stdout, stderr io.Writer) int {
 		return 0
 	}
 
-	if _, err := io.Copy(stdout, stdin); err != nil && !errors.Is(err, io.EOF) {
+	f := filter.New(patterns.Builtins, patterns.DefaultShowTail)
+	if err := f.Run(stdin, stdout); err != nil {
 		fmt.Fprintf(stderr, "mask-pipe: %v\n", err)
 		return 1
 	}

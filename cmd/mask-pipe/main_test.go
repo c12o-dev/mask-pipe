@@ -50,7 +50,7 @@ func TestInvalidFlag(t *testing.T) {
 	}
 }
 
-func TestPassthrough(t *testing.T) {
+func TestCleanPassthrough(t *testing.T) {
 	input := "hello\nworld\n"
 	var stdout, stderr bytes.Buffer
 	code := run(nil, strings.NewReader(input), &stdout, &stderr)
@@ -59,5 +59,18 @@ func TestPassthrough(t *testing.T) {
 	}
 	if stdout.String() != input {
 		t.Errorf("stdout = %q, want %q", stdout.String(), input)
+	}
+}
+
+func TestMaskingEndToEnd(t *testing.T) {
+	input := "key is AKIAIOSFODNN7EXAMPLE\nno secret here\n"
+	want := "key is AKIA************MPLE\nno secret here\n"
+	var stdout, stderr bytes.Buffer
+	code := run(nil, strings.NewReader(input), &stdout, &stderr)
+	if code != 0 {
+		t.Errorf("exit code = %d, want 0; stderr=%q", code, stderr.String())
+	}
+	if stdout.String() != want {
+		t.Errorf("stdout = %q, want %q", stdout.String(), want)
 	}
 }
