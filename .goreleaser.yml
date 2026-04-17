@@ -48,4 +48,4 @@ brews:
     homepage: https://github.com/c12o-dev/mask-pipe
     description: Filter secrets from terminal output
     license: MIT
-    skip_upload: auto
+    skip_upload: true  # change to 'auto' after creating c12o-dev/homebrew-tap
