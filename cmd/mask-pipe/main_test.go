@@ -74,3 +74,44 @@ func TestMaskingEndToEnd(t *testing.T) {
 		t.Errorf("stdout = %q, want %q", stdout.String(), want)
 	}
 }
+
+func TestListPatternsSubcommand(t *testing.T) {
+	var stdout, stderr bytes.Buffer
+	code := run([]string{"list-patterns"}, strings.NewReader(""), &stdout, &stderr)
+	if code != 0 {
+		t.Errorf("exit code = %d, want 0; stderr=%q", code, stderr.String())
+	}
+	out := stdout.String()
+	if !strings.Contains(out, "aws_access_key") {
+		t.Errorf("output missing aws_access_key: %q", out)
+	}
+	if !strings.Contains(out, "builtin") {
+		t.Errorf("output missing 'builtin' source: %q", out)
+	}
+	if !strings.Contains(out, "enabled") {
+		t.Errorf("output missing 'enabled' status: %q", out)
+	}
+}
+
+func TestDoctorSubcommand(t *testing.T) {
+	var stdout, stderr bytes.Buffer
+	code := run([]string{"doctor"}, strings.NewReader(""), &stdout, &stderr)
+	if code != 0 {
+		t.Errorf("exit code = %d, want 0; stderr=%q", code, stderr.String())
+	}
+	out := stdout.String()
+	if !strings.Contains(out, "All checks passed") {
+		t.Errorf("output missing 'All checks passed': %q", out)
+	}
+	if !strings.Contains(out, "8/8 enabled") {
+		t.Errorf("output missing '8/8 enabled': %q", out)
+	}
+}
+
+func TestUnknownSubcommand(t *testing.T) {
+	var stdout, stderr bytes.Buffer
+	code := run([]string{"notreal"}, strings.NewReader(""), &stdout, &stderr)
+	if code != 2 {
+		t.Errorf("exit code = %d, want 2", code)
+	}
+}
