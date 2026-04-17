@@ -133,7 +133,7 @@ func TestDefaultMask(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := DefaultMask(tt.value, tt.showTail)
+			got := DefaultMask(tt.value, tt.showTail, "*")
 			if got != tt.want {
 				t.Errorf("DefaultMask(%q, %d) = %q, want %q", tt.value, tt.showTail, got, tt.want)
 			}
