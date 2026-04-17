@@ -21,6 +21,9 @@ TruffleHog guards your code. secretlint guards your commits. **mask-pipe guards 
 ## Install
 
 ```bash
+# Homebrew (macOS / Linux)
+brew install c12o-dev/tap/mask-pipe
+
 # Go
 go install github.com/c12o-dev/mask-pipe/cmd/mask-pipe@latest
 
