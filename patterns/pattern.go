@@ -29,15 +29,18 @@ type Pattern struct {
 
 const DefaultShowTail = 4
 
-// DefaultMask keeps the first 4 and last showTail characters visible.
-// showTail <= 0 fully masks the value.
-func DefaultMask(value string, showTail int) string {
+// DefaultMask keeps the first 4 and last showTail characters visible,
+// replacing the middle with maskChar. showTail <= 0 fully masks.
+func DefaultMask(value string, showTail int, maskChar string) string {
+	if maskChar == "" {
+		maskChar = "*"
+	}
 	if showTail <= 0 {
-		return strings.Repeat("*", len(value))
+		return strings.Repeat(maskChar, len(value))
 	}
 	const head = 4
 	if len(value) <= head+showTail {
-		return strings.Repeat("*", len(value))
+		return strings.Repeat(maskChar, len(value))
 	}
-	return value[:head] + strings.Repeat("*", len(value)-head-showTail) + value[len(value)-showTail:]
+	return value[:head] + strings.Repeat(maskChar, len(value)-head-showTail) + value[len(value)-showTail:]
 }
