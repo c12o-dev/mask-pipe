@@ -34,14 +34,17 @@ Each pattern in the codebase MUST declare:
 
 ```go
 type Pattern struct {
-    ID          string   // Stable identifier (e.g., "aws_access_key")
-    Name        string   // Human-readable name
+    ID          string         // Stable identifier (e.g., "aws_access_key")
+    Name        string         // Human-readable name
     Regex       *regexp.Regexp
-    CaptureIdx  int      // Which capture group holds the value to mask (0 = entire match)
-    Replacement string   // "****" or custom per-pattern
-    Examples    []string // At least 5 strings that SHOULD match
-    NonExamples []string // At least 5 strings that SHOULD NOT match
-    Source      string   // URL to vendor doc or spec justifying the format
+    CaptureIdx  int            // Which capture group holds the value to mask (0 = entire match)
+    Replacement string         // "****" or custom per-pattern
+    Examples    []string       // At least 5 strings that SHOULD match
+    NonExamples []string       // At least 5 strings that SHOULD NOT match
+    Source      string         // URL to vendor doc or spec justifying the format
+    Multiline   bool           // If true, engine uses begin/end marker buffering (ADR 0004)
+    BeginMarker *regexp.Regexp // Line that starts a multi-line block (required if Multiline)
+    EndMarker   *regexp.Regexp // Line that ends a multi-line block (required if Multiline)
 }
 ```
 

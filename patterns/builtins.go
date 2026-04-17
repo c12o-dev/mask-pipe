@@ -9,4 +9,5 @@ var Builtins = []*Pattern{
 	stripeKey,
 	jwt,
 	dbURLPassword,
+	pemPrivateKey,
 }
