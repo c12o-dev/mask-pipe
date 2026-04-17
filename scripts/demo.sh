@@ -1,17 +1,18 @@
 #!/usr/bin/env bash
-# asciinema demo script for mask-pipe
-# Usage: asciinema rec --command "bash scripts/demo.sh" demo.cast
+# asciinema / VHS demo script for mask-pipe
+# Each command clears the screen and shows the header, so the recording
+# stays compact. The final frame shows doctor + install info.
 #
-# After recording:
-#   asciinema upload demo.cast
-#   # or convert to GIF:
-#   agg demo.cast demo.gif
+# Usage: asciinema rec --command "bash scripts/demo.sh" demo.cast
+#   or:  just run in Windows Terminal and record with Win+G
 
 set -e
 
-# Typing simulation
+HEADER="  mask-pipe — filter secrets from terminal output"
+FOOTER_INSTALL="  Install: brew install c12o-dev/tap/mask-pipe"
+FOOTER_GITHUB="  GitHub:  https://github.com/c12o-dev/mask-pipe"
+
 type_cmd() {
-    echo ""
     echo -n "$ "
     for ((i=0; i<${#1}; i++)); do
         echo -n "${1:$i:1}"
@@ -21,46 +22,50 @@ type_cmd() {
     sleep 0.3
 }
 
-pause() { sleep "${1:-1.5}"; }
+frame() {
+    clear
+    echo "$HEADER"
+    echo ""
+}
 
-clear
+pause() { sleep "${1:-2}"; }
 
-echo "  mask-pipe — filter secrets from terminal output"
-echo ""
-pause 2
-
-# Demo 1: Basic masking
+# Frame 1: AWS key
+frame
 type_cmd "echo 'AWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE' | mask-pipe"
 echo 'AWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE' | mask-pipe
-pause 2
+pause
 
-# Demo 2: Multiple secrets
+# Frame 2: DB URL
+frame
 type_cmd "echo 'DB: postgres://admin:s3cretP4ss@db.example.com:5432/app' | mask-pipe"
 echo 'DB: postgres://admin:s3cretP4ss@db.example.com:5432/app' | mask-pipe
-pause 2
+pause
 
-# Demo 3: GitHub token
+# Frame 3: GitHub token
+frame
 type_cmd "echo 'GITHUB_TOKEN=ghp_ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefgh1234' | mask-pipe"
 echo 'GITHUB_TOKEN=ghp_ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefgh1234' | mask-pipe
-pause 2
+pause
 
-# Demo 4: Clean text passes through
+# Frame 4: Clean passthrough
+frame
 type_cmd "echo 'no secrets here, just normal output' | mask-pipe"
 echo 'no secrets here, just normal output' | mask-pipe
-pause 2
+pause
 
-# Demo 5: Dry-run mode
+# Frame 5: Dry-run
+frame
 type_cmd "echo 'AKIAIOSFODNN7EXAMPLE' | mask-pipe --dry-run --no-color"
 echo 'AKIAIOSFODNN7EXAMPLE' | mask-pipe --dry-run --no-color
-pause 2
+pause
 
-# Demo 6: Doctor
+# Frame 6 (final): Doctor + install info
+frame
 type_cmd "mask-pipe doctor"
 mask-pipe doctor
-pause 2
-
 echo ""
-echo "  Install: brew install c12o-dev/tap/mask-pipe"
-echo "  GitHub:  https://github.com/c12o-dev/mask-pipe"
+echo "$FOOTER_INSTALL"
+echo "$FOOTER_GITHUB"
 echo ""
-pause 3
+pause 4
