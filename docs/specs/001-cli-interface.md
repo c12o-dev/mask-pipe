@@ -26,6 +26,7 @@ $ <some-command> | mask-pipe [flags]
 **Input:**
 - `stdin` — the raw byte stream to filter
 - mask-pipe MUST operate line-by-line to preserve streaming behavior (e.g., `tail -f`)
+- **Exception:** multi-line patterns (e.g., PEM private keys) use begin/end marker buffering. Lines between a begin marker and its corresponding end marker are accumulated before matching. A safety limit (100 lines or 64KB) prevents unbounded buffering; if exceeded, buffered lines are flushed unmodified and a warning is written to stderr. See [ADR 0004](../adr/0004-multiline-buffering.md).
 - Lines MAY exceed the default `bufio.MaxScanTokenSize` (64KB); mask-pipe MUST handle lines up to at least 1MB without crashing
 
 **Output:**
